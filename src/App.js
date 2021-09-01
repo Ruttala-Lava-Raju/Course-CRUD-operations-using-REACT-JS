@@ -30,7 +30,6 @@ function ShowForm(props) {
 			<button>Cancel</button>
 		</div>
 	);
-	// props.syllabusData.editMode = 
 }
 
 function App() {
@@ -45,9 +44,6 @@ function App() {
 		}
 		syllabusItemsClone.push(emptySyllabusForm);
 		setSyllabusItem(syllabusItemsClone);
-		console.log(emptySyllabusForm);
-		console.log(syllabusArray);
-		syllabusArray.push(emptySyllabusForm);
 	}
 	return (
 		<div className="App">
