@@ -1,5 +1,7 @@
-// import './App.css';
-import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useEffect} from 'react';
+import Axios from 'axios';
+
 function SyllabusCard(props) {
 	const editSyllabusItem = () =>
 	{
@@ -47,7 +49,7 @@ function SyllabusForm(props) {
 	const data = {
 		"title": title,
 		"description": description,
-		"objectives": objectives
+		"objectives": objectives,
 	};
 	
 	const saveSyllabusItem = () =>
@@ -61,27 +63,27 @@ function SyllabusForm(props) {
 		const syllabusItem = props.syllabusData;
 		props.onCancel(index, syllabusItem);
 	};
-
+	
 	return (
 		<div>
 			<label>{props.index + 1}</label>
 			<br></br>
 			<input 
 			placeholder="Title" 
-			value={title}
+			defaultValue={title}
 			onChange={onTitleChange}></input>
 			<br></br>
 			<br></br>
 			<input 
 			placeholder="Description" 
-			value={description}
+			defaultValue={description}
 			onChange={onDescriptionChange}
 			></input>
 			<br></br>
 			<br></br>
 			<input 
 			placeholder="Learning Objectives" 
-			value={objectives}
+			defaultValue={objectives}
 			onChange={onObjectivesChange}
 			></input>
 			<br></br>
@@ -92,6 +94,7 @@ function SyllabusForm(props) {
 };
 
 function App() {
+	const token = "0a9f281a-2fc4-436f-862a-9e22b95c05dc";
 	const [syllabusArray, setSyllabusItem] = useState([]);
 	const addEmptySyllabusForm = (event) => {
 		const syllabusItemsClone = [...syllabusArray];
@@ -105,6 +108,22 @@ function App() {
 		setSyllabusItem(syllabusItemsClone);
 	};
 
+	useEffect(() => {
+		Axios.get("http://localhost:8002/api/syllabus/", {
+			headers: {Authorization: token}
+		})
+		.then((result) =>
+		{
+			const syllabusItems = result.data;
+			syllabusItems.forEach(syllabusItem => {
+				syllabusItem["editMode"] = false;
+			});
+			setSyllabusItem(syllabusItems);	
+		}).catch((error) => {
+			console.log(error);
+		})
+	}, []);
+
 	const handleEdit = (index) =>
 	{
 		const syllabusItemsClone = [...syllabusArray];
@@ -116,16 +135,49 @@ function App() {
 	{
 		const syllabusItemsClone = [...syllabusArray];
 		syllabusItemsClone[index] = data;
-		syllabusItemsClone[index].editMode = false;
-		setSyllabusItem(syllabusItemsClone);
+		const syllabusItem = syllabusItemsClone[index];
+		Axios.post("http://localhost:8002/api/syllabus/", {
+			"title": syllabusItem.title,
+			"description": syllabusItem.description,
+			"objectives": syllabusItem.objectives
+		}, {
+			headers: {Authorization: token}
+		}).then((result) => {
+			if(result.status === 201)
+			{
+				console.log(result.data);
+				syllabusItemsClone[index] = result.data[0];
+				syllabusItemsClone[index].editMode = false;
+				setSyllabusItem(syllabusItemsClone);
+			}
+		}).catch((error) =>
+		{
+			console.log(error);
+		})
 	};
 
 	const handleDelete = (index) =>
 	{
 		console.log("delete", index)
-		const syllabusItemClone = [...syllabusArray]
-		syllabusItemClone.splice(index, 1)
-		setSyllabusItem(syllabusItemClone)
+		const syllabusItemsClone = [...syllabusArray]
+		const syllabusId = syllabusItemsClone[index].syllabusID;
+		const url = "http://localhost:8002/api/syllabus/" + syllabusId;
+		console.log(url, {
+			headers: {Authorization: token}
+		});
+		Axios.delete(url)
+		.then((result) =>
+		{
+			if(result.status === 200)
+			{
+				syllabusItemsClone.splice(index, 1)
+				setSyllabusItem(syllabusItemsClone)
+			}
+		})
+		.catch((error) =>
+		{
+			console.log(error);
+		})
 	}
 	
 	const handleCancel = (index, syllabusItem) =>
@@ -147,7 +199,7 @@ function App() {
 
 	return (
 		<div className="App">
-			<button id="addSyllabusBtn" onClick={addEmptySyllabusForm}>Add Syllabus</button>
+			<button variant="primary" onClick={addEmptySyllabusForm}>Add Syllabus</button>
 		{syllabusArray.map((syllabus, index) => 
 		{
 			return(
