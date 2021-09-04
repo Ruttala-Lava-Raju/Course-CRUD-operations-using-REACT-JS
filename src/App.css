@@ -1,38 +1,109 @@
-.App {
-  text-align: center;
+#addSyllabusBtn
+{
+  float: right;
+  margin-top: 25px;
+  margin-right: 50px;
+  border-radius: 2px;
+  font-family:sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.title {
+  width: 90%;
+  height: 30px;
+  margin-top: 20px;
+  margin-left: 50px;
+  border: 1px solid whitesmoke;
+  background: transparent;
+  border-radius: 5px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.description {
+  width: 90%;
+  height: 60px;
+  margin-left: 50px;
+  background: transparent;
+  border: 1px solid whitesmoke;
+  border-radius: 5px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.description:focus {
+  background: white;
+  outline-color: lightblue;
 }
 
-.App-link {
-  color: #61dafb;
+.title:focus {
+  background: white;
+  outline-color: lightblue;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.objectives:focus {
+  background: white;
+}
+
+.objectives {
+  width: 90%;
+  height: 30px;
+  margin-left: 50px;
+  background: lightgrey;
+  border-top: 0px;
+  border-right: 0px;
+  border-left: 0px;
+  outline: 0px;
+  border-radius: 5px;
+}
+
+#deleteButton
+{
+  margin-right: 10px;
+}
+
+.card
+{
+  margin-top: 40px;
+}
+
+ #circle {
+   width: 40px;
+   height: 40px;
+   border-radius: 50%;
+   border: solid 2px rgb(111, 152, 240);
+   padding-left: 12px;
+   padding-top: 6px;
+   margin-top: 15px;
+   margin-right: 50px;
+ }
+#editBtn
+{
+  float: right;
+  margin-left: 50px;
+}
+#deleteBtn
+{
+  float: right;
+}
+
+#saveBtn
+{
+  float: right;
+  margin-right: 95px;
+  margin-left: 30px;
+}
+
+#cancelBtn
+{
+  float:right;
+}
+.card-text
+{
+  float: left;
+}
+.card.title
+{
+  float: left;
+  margin-left: 50px;
+}
+
+#syllabusNumber
+{
+  margin-left: 50px;
 }
