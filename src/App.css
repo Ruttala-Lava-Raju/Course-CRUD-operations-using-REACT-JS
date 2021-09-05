@@ -107,3 +107,25 @@
 {
   margin-left: 50px;
 }
+#logoutBtn
+{
+  margin-left: 50px;
+  margin-top:25px;
+  border-radius: 2px;
+  font-family:sans-serif;
+}
+#loginAgainBtn{
+  width: 614px;
+  margin-top: 184px;
+  margin-left: 478px;
+}
+
+#welcomeMsg{
+  padding-left: 25em;
+  font-weight:bolder;
+  font-family:cursive;
+}
+
+#loading{
+  margin: 200px;
+}

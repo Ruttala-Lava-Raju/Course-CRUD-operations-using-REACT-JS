@@ -1,8 +1,10 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect} from 'react';
-import Axios from 'axios';
+import Axios from './axios';
 import { Button, Card } from 'react-bootstrap';
+import * as bootstrap from 'react-bootstrap';
+import { useHistory } from "react-router-dom";
 function SyllabusCard(props) {
 	const editSyllabusItem = () =>
 	{
@@ -103,30 +105,25 @@ function SyllabusForm(props) {
 };
 
 function Course() {
-	const token = "0a9f281a-2fc4-436f-862a-9e22b95c05dc";
-	const headers = {
-		headers: {
-			Authorization: token
-		}
-	};
-
+	
+	let history = useHistory();
 	const [syllabusArray, setSyllabusItem] = useState([]);
+	const [isLoading, setLoading] = useState(false);
 	const addEmptySyllabusForm = (event) => {
 		const syllabusItemsClone = [...syllabusArray];
 		const emptySyllabusForm = {
-			title: undefined,
-			description: undefined,
-			objectives: undefined,
+			title: "",
+			description: "",
+			objectives: "",
 			editMode: true,
 			isUpdate: false
 		};
 		syllabusItemsClone.push(emptySyllabusForm);
 		setSyllabusItem(syllabusItemsClone);
-		console.log(syllabusArray);
 	};
 
 	useEffect(() => {
-		Axios.get("http://localhost:8002/api/syllabus/", headers)
+		Axios.get()
 		.then((result) =>
 		{
 			const syllabusItems = result.data;
@@ -135,6 +132,7 @@ function Course() {
 				syllabusItem["isUpdate"] = true;
 			});
 			setSyllabusItem(syllabusItems);	
+			setLoading(true);
 		}).catch((error) => {
 			console.log(error);
 		})
@@ -150,24 +148,23 @@ function Course() {
 	const handleSaveAndUpdate = (index, data, isUpdate) =>
 	{
 		const syllabusItemsClone = [...syllabusArray];
-		console.log(syllabusItemsClone[index]);
 		const syllabusId = syllabusItemsClone[index].syllabusID;
 		syllabusItemsClone[index] = data;
 		const syllabusItem = syllabusItemsClone[index];
 		if(!isUpdate)
 		{
-			Axios.post("http://localhost:8002/api/syllabus/", {
+			Axios.post( {
 				"title": syllabusItem.title,
 				"description": syllabusItem.description,
 				"objectives": syllabusItem.objectives
-			}, headers).then((result) => {
+			}).then((result) => {
 				if(result.status === 201)
 				{
-					console.log(result.data);
 					syllabusItemsClone[index] = result.data[0];
 					syllabusItemsClone[index].editMode = false;
 					syllabusItemsClone[index].isUpdate = true;
 					setSyllabusItem(syllabusItemsClone);
+					setLoading(true);
 				}
 			}).catch((error) =>
 			{
@@ -176,21 +173,19 @@ function Course() {
 		}
 		else
 		{
-			const url = "http://localhost:8002/api/syllabus/" + syllabusId;
-			console.log(url);
-			Axios.put(url, {
+			Axios.put("/" + syllabusId, {
 				"title": syllabusItem.title,
 				"description": syllabusItem.description,
 				"objectives": syllabusItem.objectives
-			},headers)
+			})
 			.then((result) => {
 				if(result.status === 200)
 				{
-					console.log(result.data);
 					syllabusItemsClone[index] = result.data[0];
 					syllabusItemsClone[index].editMode = false;
 					syllabusItemsClone[index].isUpdate = true;
 					setSyllabusItem(syllabusItemsClone);
+					setLoading(true);
 				}
 			})
 		}
@@ -198,17 +193,16 @@ function Course() {
 
 	const handleDelete = (index) =>
 	{
-		console.log("delete", index)
 		const syllabusItemsClone = [...syllabusArray]
 		const syllabusId = syllabusItemsClone[index].syllabusID;
-		const url = "http://localhost:8002/api/syllabus/" + syllabusId;
-		Axios.delete(url, headers)
+		Axios.delete("/" + syllabusId)
 		.then((result) =>
 		{
 			if(result.status === 200)
 			{
-				syllabusItemsClone.splice(index, 1)
-				setSyllabusItem(syllabusItemsClone)
+				syllabusItemsClone.splice(index, 1);
+				setSyllabusItem(syllabusItemsClone);
+				setLoading(true);
 			}
 		})
 		.catch((error) =>
@@ -219,9 +213,7 @@ function Course() {
 	
 	const handleCancel = (index, syllabusItem) =>
 	{
-		console.log(syllabusItem);
 		const syllabusItemClone = [...syllabusArray]
-		console.log(syllabusItem.title, syllabusItem.description, syllabusItem.objectives)
 		if(syllabusItem.title === undefined && syllabusItem.description === undefined && syllabusItem.objectives === undefined)
 		{
 			syllabusItemClone.pop();
@@ -232,12 +224,23 @@ function Course() {
 		}
 		setSyllabusItem(syllabusItemClone)
 	}
-
+	const logout = () =>
+	{
+		history.push("/")
+		window.sessionStorage.removeItem("token");
+		window.sessionStorage.removeItem("userName");
+	}
+	const userName = window.sessionStorage.getItem("userName");
+	console.log(userName);
 	return (
 		<div>
-		<Button variant="dark" className="float-right" id="addSyllabusBtn" onClick={addEmptySyllabusForm}>Add Syllabus</Button>
+		{ userName !== null ? (<><Button variant="warning" size="lg" className="float-left" id="logoutBtn" onClick={logout}>LogOut</Button>
+		<Button variant="dark" size="lg" className="float-right" id="addSyllabusBtn" onClick={addEmptySyllabusForm}>Add Syllabus</Button>
 		<br></br>
 		<br></br>
+		<label id="welcomeMsg">Welcome back {userName} !</label></>): (<Button id="loginAgainBtn" variant="warning" size="lg" onClick={logout}>Please Click Here And Login</Button>)}
+		{!isLoading && userName ? (<div id="loading"><bootstrap.Spinner animation="grow" size="lg"/></div>) : 
+		(<>
 		{syllabusArray.map((syllabus, index) => 
 		{
 			return(
@@ -262,6 +265,8 @@ function Course() {
 				</>
 			)
 		})}
+		</>)}
+		
 		</div>
 	);
 }

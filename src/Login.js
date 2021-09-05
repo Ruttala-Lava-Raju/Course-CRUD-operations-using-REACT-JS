@@ -7,6 +7,7 @@ export default function Login()
     var history = useHistory();
     const[userName, setUsername] = useState("");
     const[password, setPassword] = useState("");
+    const[errorMessage, setErrorMessage] = useState("");
     const onUserNameChange = (event) =>
     {
         setUsername(event.target.value);
@@ -27,11 +28,21 @@ export default function Login()
         {
             if(result.status === 200)
             {
+                const data = result.data[0]
+                const token = data.token;
+                const userName = data.userName;
+                console.log(token.token);
+                window.sessionStorage.setItem("token", token);
+                window.sessionStorage.setItem("userName", userName);
                 history.push("/Course");
             }
         }).catch((error) =>
         {
-            console.log(error);
+            console.log(error, error.response);
+            if(error.response.status === 404)
+            {
+                setErrorMessage("Incorrect username/password.");
+            }
         })
     }
     
@@ -42,7 +53,11 @@ export default function Login()
             <br></br>
             <label>Password: </label>
             <input type="password" onChange={onPasswordChange}></input>
+            <br></br>
+            <br></br>
             <button onClick={handleLogin}>Log In</button>
+            <br></br>
+            <label>{errorMessage}</label>
         </div>
     )
 }
